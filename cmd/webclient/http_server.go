@@ -255,16 +255,5 @@ func getLayers() []map[string]any {
 			"maxzoom": 19,
 			"parts":   []string{"a", "b", "c"},
 		},
-		{
-			"name":    "Opentopo.cz",
-			"url":     "https://tile-{s}.opentopomap.cz/{z}/{x}/{y}.png",
-			"maxzoom": 18,
-			"parts":   []string{"a", "b", "c"},
-		},
-		{
-			"name":    "Yandex maps",
-			"url":     "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&scale=2&lang=ru_RU&projection=web_mercator",
-			"maxzoom": 20,
-		},
 	}
 }
