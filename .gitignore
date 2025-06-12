@@ -11,3 +11,9 @@ test-*.yml
 *.p12
 *.sqlite
 report.xml
+
+goatak_client.yml
+goatak_server.yml
+cmd/goatak_server/goatak_server
+cmd/webclient/webclient
+cmd/webclient/config_*.zip
