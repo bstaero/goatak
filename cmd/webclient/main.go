@@ -65,6 +65,7 @@ type App struct {
 
 	callsign string
 	uid      string
+	password string
 	typ      string
 	team     string
 	device   string
@@ -74,6 +75,8 @@ type App struct {
 	role     string
 	pos      atomic.Pointer[model.Pos]
 	zoom     int8
+
+	jwtKey []byte
 }
 
 func NewApp(uid string, callsign string, connectStr string, webPort int) *App {
@@ -388,6 +391,7 @@ func main() {
 	app.typ = k.String("me.type")
 	app.team = k.String("me.team")
 	app.role = k.String("me.role")
+	app.password = k.String("me.password")
 
 	app.device = k.String("me.device")
 	app.version = k.String("me.version")

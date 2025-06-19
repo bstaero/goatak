@@ -18,3 +18,7 @@ div.info {
     line-height: 100%;
     text-align: center;
 }
+
+.login-div {
+    padding: 5px;
+}

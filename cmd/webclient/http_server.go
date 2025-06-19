@@ -1,20 +1,22 @@
 package main
 
 import (
+	"crypto/rand"
 	"embed"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/kdudkov/goatak/staticfiles"
 	"net/http"
 	"runtime/pprof"
 	"time"
 
-	"github.com/kdudkov/goatak/internal/wshandler"
-	"github.com/kdudkov/goatak/pkg/log"
-	"github.com/kdudkov/goatak/staticfiles"
-
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 	"github.com/google/uuid"
+	"github.com/kdudkov/goatak/internal/wshandler"
+	"github.com/kdudkov/goatak/pkg/log"
 
 	"github.com/kdudkov/goatak/pkg/cot"
 	"github.com/kdudkov/goatak/pkg/model"
@@ -31,7 +33,24 @@ func NewHttp(app *App) *fiber.App {
 	srv := fiber.New(fiber.Config{EnablePrintRoutes: false, DisableStartupMessage: true, Views: engine})
 
 	srv.Use(log.NewFiberLogger(nil))
+
 	staticfiles.Embed(srv)
+	if len(app.password) > 0 {
+		// Add auth handlers if configured with a password
+		jwtKey := make([]byte, 32)
+		_, err := rand.Read(jwtKey)
+		if err != nil {
+			panic(err)
+		}
+
+		app.jwtKey = jwtKey
+		srv.Get("/login", getLogin)
+		srv.Post("/login", postLogin(app))
+		srv.Use(jwtware.New(jwtware.Config{
+			SigningKey:  jwtware.SigningKey{Key: app.jwtKey},
+			TokenLookup: "cookie:token",
+		}))
+	}
 
 	srv.Get("/", getIndexHandler(app))
 	srv.Get("/api/config", getConfigHandler(app))
@@ -50,6 +69,38 @@ func NewHttp(app *App) *fiber.App {
 	srv.Get("/stack", getStackHandler())
 
 	return srv
+}
+
+func getLogin(ctx *fiber.Ctx) error {
+	return ctx.Render("templates/login", nil, "templates/header")
+}
+
+func postLogin(app *App) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		user := ctx.FormValue("user")
+		pass := ctx.FormValue("pass")
+
+		if user != app.callsign || pass != app.password {
+			return ctx.Redirect("/login")
+		}
+
+		claims := jwt.MapClaims{
+			"name": app.callsign,
+			"exp":  time.Now().Add(time.Hour * 24).Unix(),
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		t, err := token.SignedString(app.jwtKey)
+		if err != nil {
+			return ctx.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		ctx.Cookie(&fiber.Cookie{
+			Name:  "token",
+			Value: t,
+		})
+		return ctx.Redirect("/")
+	}
 }
 
 func getIndexHandler(_ *App) fiber.Handler {
