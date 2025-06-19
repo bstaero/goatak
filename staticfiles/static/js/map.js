@@ -44,6 +44,7 @@ const app = Vue.createApp({
         this.renew();
         setInterval(this.renew, 5000);
         setInterval(this.sender, 1000);
+        setInterval(this.updateConfig, 5000);
 
         map.on('click', this.mapClick);
         map.on('mousemove', this.mouseMove);
@@ -61,6 +62,25 @@ const app = Vue.createApp({
     },
 
     methods: {
+        updateConfig: function () {
+            let vm = this;
+
+            fetch('/api/config')
+                .then(resp => resp.json())
+                .then(data => {
+                    vm.config = data;
+                    if (vm.config.callsign) {
+                        map.removeLayer(vm.me);
+                        vm.me = L.marker([data.lat, data.lon]);
+                        vm.me.setIcon(L.icon({
+                            iconUrl: "/static/icons/self.png",
+                            iconAnchor: new L.Point(16, 16),
+                        }));
+                        vm.me.addTo(map);
+                    }
+                });
+        },
+
         getConfig: function () {
             let vm = this;
 
