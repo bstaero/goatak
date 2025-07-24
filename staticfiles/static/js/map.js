@@ -30,6 +30,8 @@ const app = Vue.createApp({
         map = L.map('map');
         map.setView([60, 30], 11);
 
+        this.map = map;
+
         L.control.scale({metric: true}).addTo(map);
 
         this.getConfig();

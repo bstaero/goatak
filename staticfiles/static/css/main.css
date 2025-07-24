@@ -22,3 +22,7 @@ div.info {
 .login-div {
     padding: 5px;
 }
+
+.bi-geo {
+    cursor: pointer !important;
+}
