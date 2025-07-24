@@ -136,7 +136,7 @@ func (app *App) Run(ctx context.Context) {
 
 	if app.webPort >= 0 {
 		go func() {
-			addr := fmt.Sprintf(":%d", app.webPort)
+			addr := fmt.Sprintf("0.0.0.0:%d", app.webPort)
 			app.logger.Info("listening " + addr)
 
 			if err := NewHttp(app).Listen(addr); err != nil {

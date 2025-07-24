@@ -25,6 +25,11 @@ import (
 //go:embed templates
 var templates embed.FS
 
+type Auth struct {
+	User string `json:"user" form:"user"`
+	Pass string `json:"pass" form:"pass"`
+}
+
 func NewHttp(app *App) *fiber.App {
 	engine := html.NewFileSystem(http.FS(templates), ".html")
 
@@ -77,10 +82,12 @@ func getLogin(ctx *fiber.Ctx) error {
 
 func postLogin(app *App) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		user := ctx.FormValue("user")
-		pass := ctx.FormValue("pass")
+		auth := new(Auth)
+		if err := ctx.BodyParser(auth); err != nil {
+			return err
+		}
 
-		if user != app.callsign || pass != app.password {
+		if auth.User != app.callsign || auth.Pass != app.password {
 			return ctx.Redirect("/login")
 		}
 
@@ -99,6 +106,7 @@ func postLogin(app *App) fiber.Handler {
 			Name:  "token",
 			Value: t,
 		})
+
 		return ctx.Redirect("/")
 	}
 }
@@ -165,6 +173,7 @@ func getPosHandler(app *App) fiber.Handler {
 		pos := make(map[string]float64)
 
 		if err := ctx.BodyParser(&pos); err != nil {
+			app.logger.Info(fmt.Sprintf("Error: %v\n", err))
 			return err
 		}
 
