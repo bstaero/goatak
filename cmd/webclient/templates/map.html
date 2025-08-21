@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card mb-1">
+                <div class="card mb-1 hidden">
                     <div class="card-header">Tools</div>
                     <div class="card-body">
                         <div class="btn-group" role="group" aria-label="Tools">
@@ -149,7 +149,7 @@
                                     @click="openChat(current_unit.uid, current_unit.unit.callsign);"><i
                                     class="bi bi-chat-text-fill"></i></button>
                         </div>
-                        <div v-else>
+                        <div class="hidden" v-else>
                             <button class="btn btn-sm btn-outline-primary ms-1" data-bs-toggle="modal"
                                     data-bs-target="#edit">
                                 <i class="bi bi-pencil-square"></i>

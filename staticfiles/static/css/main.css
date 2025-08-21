@@ -26,3 +26,7 @@ div.info {
 .bi-geo {
     cursor: pointer !important;
 }
+
+.hidden {
+    display: none;
+}
