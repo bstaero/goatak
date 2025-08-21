@@ -305,16 +305,16 @@ func getTypes(ctx *fiber.Ctx) error {
 func getLayers() []map[string]any {
 	return []map[string]any{
 		{
-			"name":    "Google Hybrid",
-			"url":     "http://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&s=Galileo&scale=2",
-			"maxzoom": 20,
-			"parts":   []string{"0", "1", "2", "3"},
-		},
-		{
 			"name":    "OSM",
 			"url":     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			"maxzoom": 19,
 			"parts":   []string{"a", "b", "c"},
+		},
+		{
+			"name":    "Google Hybrid",
+			"url":     "http://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&s=Galileo&scale=2",
+			"maxzoom": 20,
+			"parts":   []string{"0", "1", "2", "3"},
 		},
 	}
 }
