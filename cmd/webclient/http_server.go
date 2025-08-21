@@ -248,6 +248,7 @@ func addMessageHandler(app *App) fiber.Handler {
 		app.logger.Debug(m.String())
 		app.SendMsg(m)
 		app.chatMessages.Add(msg)
+		app.chatCb.AddMessage(msg)
 
 		return ctx.JSON(app.chatMessages.Chats)
 	}
