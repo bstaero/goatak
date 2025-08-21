@@ -40,6 +40,7 @@ func NewHttp(app *App) *fiber.App {
 	srv.Use(log.NewFiberLogger(nil))
 
 	staticfiles.Embed(srv)
+	srv.Get("/", getIndexHandler(app))
 	if len(app.password) > 0 {
 		// Add auth handlers if configured with a password
 		jwtKey := make([]byte, 32)
@@ -57,7 +58,6 @@ func NewHttp(app *App) *fiber.App {
 		}))
 	}
 
-	srv.Get("/", getIndexHandler(app))
 	srv.Get("/api/config", getConfigHandler(app))
 	srv.Get("/api/types", getTypes)
 	srv.Post("/api/dp", getDpHandler(app))
@@ -111,8 +111,12 @@ func postLogin(app *App) fiber.Handler {
 	}
 }
 
-func getIndexHandler(_ *App) fiber.Handler {
+func getIndexHandler(app *App) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		if len(app.password) > 0 && ctx.Cookies("token", "") == "" {
+			return ctx.Redirect("/login")
+		}
+
 		data := fiber.Map{
 			"js": []string{"util.js", "map.js"},
 		}
