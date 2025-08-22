@@ -168,7 +168,11 @@ const app = Vue.createApp({
             fetch('/api/unit', {redirect: 'manual'})
                 .then(resp => {
                     if (!resp.ok) {
-                        window.location.reload();
+                        if (resp.status === 401) {
+                            window.location.href = "/login";
+                        } else {
+                            window.location.reload();
+                        }
                     }
                     return resp.json();
                 })
@@ -181,7 +185,11 @@ const app = Vue.createApp({
             fetch('/api/message', {redirect: 'manual'})
                 .then(resp => {
                     if (!resp.ok) {
-                        window.location.reload();
+                        if (resp.status === 401) {
+                            window.location.href = "/login";
+                        } else {
+                            window.location.reload();
+                        }
                     }
                     return resp.json();
                 })
