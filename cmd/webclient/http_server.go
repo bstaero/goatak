@@ -73,6 +73,8 @@ func NewHttp(app *App) *fiber.App {
 
 	srv.Get("/stack", getStackHandler())
 
+	go clearOldItems(app)
+
 	return srv
 }
 
@@ -295,7 +297,6 @@ func getUnits(app *App) []*model.WebUnit {
 
 	app.items.ForEach(func(item *model.Item) bool {
 		units = append(units, item.ToWeb())
-
 		return true
 	})
 
@@ -321,4 +322,27 @@ func getLayers() []map[string]any {
 			"parts":   []string{"0", "1", "2", "3"},
 		},
 	}
+}
+
+func clearOldItems(app *App) {
+	var remove []string
+	app.items.ForEach(func(item *model.Item) bool {
+		if item.GetLastSeen().Add(time.Minute).Before(time.Now()) {
+			remove = append(remove, item.GetUID())
+		}
+
+		return true
+	})
+
+	if len(remove) > 0 {
+		msg := fmt.Sprintf("Cleaning up %d points...", len(remove))
+		app.logger.Info(msg)
+
+		for _, uid := range remove {
+			app.items.Remove(uid)
+		}
+	}
+
+	time.Sleep(time.Minute)
+	clearOldItems(app)
 }
